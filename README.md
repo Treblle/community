@@ -23,6 +23,16 @@
 
 Welcome to the Treblle Community. There are a few important links you might want to pay attention to.
 
+## Submitting articles
+
+We have a list of articles that we are always open for guest writers. Please check the Issues in this repo.
+
+There is a template article in the article directory for you to follow, please include as much information as possible.
+
+To submit an article, fork this repo add an article to the articles directory, open a PR, and we will proof read and publish if it meets our quality checks. We will always do our best not to make changes to your content.
+
+All articles must be at least 1500 words.
+
 ## Links
 
 - [Discord Community](https://treblle.com/chat)
