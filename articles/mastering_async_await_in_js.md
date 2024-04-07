@@ -1,17 +1,18 @@
 ---
 author: Ajike Emmanuel
+
 website: Your website if available
+
 avatar: https://avatars.githubusercontent.com/u/117521496?s=400&u=4e7cec76593d8c25a7b5fa073f2045d0d2abf85c&v=4
+
 twitter: https://twitter.com/___emee_
+
 linkedin: https://www.linkedin.com/in/emmanuel-ajike-687396257/
 ---
-
-# Mastering async await in javascript
 
 Async/await is a JavaScript feature that allows you to wait or pause code execution until something has finished, or in this case, resolved, before code execution can carry on.
 
 In other words, it's like saying JavaScript will wait for this to finish before you can continue.
-
 **I will assume you have some experience with JavaScript and asynchronous programming.**
 
 In the real world, the closest thing to an async/await operation is a regular traffic light. It instructs drivers, pedestrians, etc., to hold on while the other lane gets to pass. You wait for your turn.
@@ -29,6 +30,7 @@ function fetchPokemonData() {
 	let request1 = fetch("https://pokeapi.co/api/v2/pokemon/ditto").then(
 		(response) => response.json()
 	);
+
 	let request2 = fetch("https://pokeapi.co/api/v2/pokemon/pikachu").then(
 		(response) => response.json()
 	);
@@ -39,7 +41,6 @@ function fetchPokemonData() {
 }
 
 // Alternatively
-
 async function fetchPokemonData() {
 	// The fetch API returns a promise, so we wait for it to resolve before we continue.
 	let request1 = await fetch("https://pokeapi.co/api/v2/pokemon/ditto");
@@ -52,7 +53,6 @@ async function fetchPokemonData() {
 }
 
 // Even better
-
 async function fetchPokemonData() {
 	let [request1, request2] = await Promise.all([
 		fetch("https://pokeapi.co/api/v2/pokemon/ditto"),
@@ -63,6 +63,7 @@ async function fetchPokemonData() {
 		request1.json(),
 		request2.json(),
 	]);
+
 	return [response1.name, response2.name];
 }
 ```
@@ -75,9 +76,7 @@ A promise in JavaScript is a function that lets us resolve or reject based on th
 // Syntax
 new Promise((resolve, reject) => {
 	// Returns the value and breaks out of this code block
-	resolve("some value");
-
-	// Throws an error and breaks out of this code block
+	resolve("some value"); // Throws an error and breaks out of this code block
 	reject("some error");
 });
 ```
@@ -160,6 +159,7 @@ When fetching data, it's important to avoid nesting your fetch calls to prevent 
 
 ```js
 // Avoid this pitfall request
+
 async function fetchPokemonData() {
 	let analytics = await fetch("https://example.com/analytics/1092");
 	let userData = await fetch("https://example.com/api/user/123");
@@ -171,6 +171,7 @@ async function fetchPokemonData() {
 }
 
 // Much better, causes the requests to be executed in parallel
+
 async function fetchUserData() {
 	let [userData, analytics] = await Promise.all([
 		fetch("https://example.com/api/user/123"),
@@ -213,10 +214,7 @@ const tryCatch = async (cb, ...args) => {
 
 async function fetchData(id) {
 	// Error path
-	throw new Error(`Could not find user with id: ${id}`);
-
-	// Success path (commented out for demonstration)
-	// return `The blog data was fetched for user by id: ${id}`;
+	throw new Error(`Could not find user with id: ${id}`); // Success path (commented out for demonstration) // return `The blog data was fetched for user by id: ${id}`;
 }
 
 async function getUserId() {
@@ -232,6 +230,102 @@ async function getUserId() {
 
 getUserId();
 ```
+
+### Cancellation of Asynchronous Operations
+
+Asynchronous operations are the backbone of modern web applications. They allow us to fetch data, perform tasks without blocking the UI, and create a more responsive user experience. But what happens when an asynchronous operation takes longer than expected, or becomes irrelevant based on user actions? This is where cancellation comes in.
+
+Cancellation gives us the power to gracefully interrupt ongoing asynchronous operations. Imagine you're waiting for an API response, but the user navigates away from the page. In this scenario, canceling the ongoing API call would be ideal to avoid unnecessary processing and improve performance.
+
+Here, we'll explore how to achieve cancellation using the `AbortController` and `EventEmitter` classes. Similar to how we can cancel a fetch request using the `AbortController` API in the browser.
+
+##### Building the Cancellation Mechanism
+
+We'll leverage the `EventEmitter` class, a core JavaScript module for creating custom events. We'll build an `AbortController` class that inherits from `EventEmitter`. This `AbortController` will act as a central entity for managing cancellation signals.
+
+```js
+const EventEmitter = require("events");
+
+class AbortController extends EventEmitter {
+	constructor(options) {
+		super(options);
+		this.addListener();
+	}
+
+	addListener() {
+		this.on("abort", () => {
+			console.log("Listener added");
+		});
+
+		return this;
+	}
+
+	abort(timeoutId, handler) {
+		clearTimeout(timeoutId);
+		handler();
+		console.log("Event aborted");
+	}
+}
+```
+
+The `AbortController` has two key methods:
+
+- `addListener`: This method adds an event listener for the "abort" event. You can customize this behavior to suit your specific needs. In our example, it simply logs a message.
+- `abort`: This method takes two arguments: the timeout ID associated with the asynchronous operation and a callback function. When called, it clears the timeout and executes the callback function, effectively canceling the operation.
+
+We'll create a `wait` function that simulates an asynchronous operation. This function takes two arguments:
+
+- `time`: The amount of time (in milliseconds) to wait before resolving the promise.
+- `signal` (optional): An instance of the `AbortController` class.
+
+```js
+function wait(time, signal) {
+	return new Promise((resolve, reject) => {
+		const timeoutId = setTimeout(() => {
+			console.log("API was called, operation was not aborted");
+			resolve();
+		}, time);
+
+		if (signal) {
+			signal.abort(timeoutId, resolve); // Corrected method call
+		}
+	});
+}
+```
+
+The `wait` function returns a promise. Inside the promise, we set a timeout using `setTimeout`. If a `signal` object is provided, we attach a listener to the `abort` event emitted by the `AbortController`. When the `abort` event is triggered, the `abort` method of the `AbortController` is called. This method clears the timeout and resolves the promise, effectively canceling the operation.
+
+##### Putting it All Together: The `main` Function
+
+Finally, let's see how we can use the `AbortController` and `wait` function in practice:
+
+```js
+async function main() {
+	try {
+		let signal = new AbortController();
+
+		// Option 1: Using addListener for explicit control
+		await wait(10000, signal.addListener());
+
+		// Option 2: Passing the AbortController instance directly
+		// await wait(10000, signal);
+
+		// await wait(10000); // Without abort controller
+		console.log("Resolved request");
+	} catch (e) {
+		console.log("Rejected request");
+	}
+}
+
+main();
+```
+
+In the `main` function, we create an instance of `AbortController`. We then have two options for using the `wait` function with cancellation:
+
+1. **Explicit Control with `addListener`**: We call `signal.addListener()` to add an event listener for the "abort" event. This approach provides more granular control over the cancellation behavior.
+2. **Direct Instance Passing**: We can simply pass the `signal` instance directly as the second argument to the `wait` function. This is a more concise approach.
+
+With either option, if we decide to cancel the operation before the timeout expires, we can trigger the `abort` event on the `signal` object. This will in turn clear the timeout and resolve the promise associated with the `wait` function.
 
 ### Conclusion
 
