@@ -10,6 +10,8 @@ twitter: https://twitter.com/___emee_
 linkedin: https://www.linkedin.com/in/emmanuel-ajike-687396257/
 ---
 
+# Mastering async await in javascript
+
 Async/await is a JavaScript feature that allows you to wait or pause code execution until something has finished, or in this case, resolved, before code execution can carry on.
 
 In other words, it's like saying JavaScript will wait for this to finish before you can continue.
