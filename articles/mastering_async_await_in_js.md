@@ -216,7 +216,9 @@ const tryCatch = async (cb, ...args) => {
 
 async function fetchData(id) {
 	// Error path
-	throw new Error(`Could not find user with id: ${id}`); // Success path (commented out for demonstration) // return `The blog data was fetched for user by id: ${id}`;
+	throw new Error(`Could not find user with id: ${id}`);
+	// Success path (commented out for demonstration)
+	// return `The blog data was fetched for user by id: ${id}`;
 }
 
 async function getUserId() {
@@ -289,7 +291,7 @@ function wait(time, signal) {
 		}, time);
 
 		if (signal) {
-			signal.abort(timeoutId, resolve); // Corrected method call
+			signal.abort(timeoutId, resolve); // Resolve or Reject as you need
 		}
 	});
 }
