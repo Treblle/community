@@ -10,22 +10,23 @@ twitter: https://twitter.com/___emee_
 linkedin: https://www.linkedin.com/in/emmanuel-ajike-687396257/
 ---
 
-# Mastering async await in javascript
+# Mastering async/await in javascript
 
-Async/await is a JavaScript feature that allows you to wait or pause code execution until something has finished, or in this case, resolved, before code execution can carry on.
+Async/await is a JavaScript feature that allows you to wait or pause code execution until something has finished or in this case resolved before code execution can carry on
 
-In other words, it's like saying JavaScript will wait for this to finish before you can continue.
-**I will assume you have some experience with JavaScript and asynchronous programming.**
+So in essence, it is like telling JavaScript to wait for this to finish before you can continue.
 
-In the real world, the closest thing to an async/await operation is a regular traffic light. It instructs drivers, pedestrians, etc., to hold on while the other lane gets to pass. You wait for your turn.
+**I will assume you have some experience of Javascript and asynchronous programming.**
 
-In the world of programming, you would know that computers are very fast. So, you would probably think a simple API call gives results right away, right? But the conditions are not always perfect. That simple API call can be influenced by factors like bandwidth, data center outages, etc. So, the concept of async/await is here to help us instruct the computer to hold on until we can get the value we were expecting.
+In the real world the closest thing to an Async/await operation is the regular traffic light that instructs drivers, pedestrians etc. to hold on this or the other lane is to pass, wait for your turn.
+
+In the world of programming you would know that computers are so fast so you would probably think a simple api call gives work right away right?, But the conditions are not always perfect and that simple api call can be influenced by factors like bandwidth, data center outages etc. The async/await mechanism serves as a way to instruct the computer to wait for the anticipated result to arrive.
 
 ### Promises
 
-A promise is an object which represents the possible completion or failure of an asynchronous operation and it's value. It is a placeholder or proxy for a value not necessarily known when the promise is created. It provides asynchronous handlers for the eventual success (resolve) and failure (reject). It has 3 possible states. A promise is said to be *settled* if it is either fulfilled or rejected, but not pending. Read more at [MDN](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+An object which represents the favorable value or error of an async operation is a promise. It is a placeholder for a value not necessarily known when creating the promise. It provides asynchronous handlers for the eventual success (resolve) and failure (reject). It has 3 possible states. A promise is said to be _settled_ if it is either fulfilled or rejected, but not pending. Stop by https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise
 
-An async function will always return a promise: pending, resolved, or rejected. Pending is the initial state neither resolved or rejected. Resolved is when you get your value, and rejected is when it throws an error. The `await` keyword is used to wait for the value.
+An async function will always return a promise status of pending, resolved, or rejected. Resolved is when you get your value and rejected is when it throws an error. Together with the await keyword we can wait for the value to resolve.
 
 ```js
 function fetchPokemonData() {
@@ -38,31 +39,38 @@ function fetchPokemonData() {
 	);
 
 	let response1 = request1.name;
+
 	let response2 = request2.name;
+
 	return [response1, response2];
 }
 
 // Alternatively
+
 async function fetchPokemonData() {
-	// The fetch API returns a promise, so we wait for it to resolve before we continue.
 	let request1 = await fetch("https://pokeapi.co/api/v2/pokemon/ditto");
+
 	let request2 = await fetch("https://pokeapi.co/api/v2/pokemon/pikachu");
 
 	let response1 = await request1.json();
+
 	let response2 = await request2.json();
 
 	return [response1.name, response2.name];
 }
 
 // Even better
+
 async function fetchPokemonData() {
 	let [request1, request2] = await Promise.all([
 		fetch("https://pokeapi.co/api/v2/pokemon/ditto"),
+
 		fetch("https://pokeapi.co/api/v2/pokemon/pikachu"),
 	]);
 
 	let [response1, response2] = await Promise.all([
 		request1.json(),
+
 		request2.json(),
 	]);
 
@@ -72,18 +80,21 @@ async function fetchPokemonData() {
 
 ### Custom Promises
 
-A promise in JavaScript is a function that lets us resolve or reject based on the values we want.
+A promise in javascript is a function that lets us resolve or reject based on the values we want
 
 ```js
 // Syntax
+
 new Promise((resolve, reject) => {
 	// Returns the value and breaks out of this code block
+
 	resolve("some value"); // Throws an error and breaks out of this code block
+
 	reject("some error");
 });
 ```
 
-Sometimes, when working with custom packages from npm, some of them might not implement promises but still use callback statements. Here's how we can create a custom promise-based wait function using `setTimeout`:
+Some custom packages from npm most times do not make use of promises but are still using callback functions. Here is how we can create a custom promise based wait function using `setTimeout`
 
 ```js
 const wait = (seconds) => {
@@ -94,50 +105,58 @@ const wait = (seconds) => {
 
 async function run() {
 	await wait(6000);
+
 	console.log("Run was called after 6 seconds");
 }
 
 run();
 ```
 
-The `setTimeout` function accepts two arguments: a function and the number of seconds to wait before calling the function. The `wait` function returns a promise, allowing us to await it.
+The `setTimeout` accepts two arguments: a function and the number of seconds to wait before calling the function. The wait function returns a promise allowing us to await it.
 
 ### Async Loops
 
-There are many iterative methods or functions in JavaScript that allow you to perform an operation for each item in an array or collection of values. Some of these functions are `forEach`, `map`, `for...in`, etc. However, the problem is that not all of them are asynchronous.
+There are so many repetitious functions in Javascript, which allow us to accomplish an operation for each item in an array of values. Some of these functions are `forEach`, `map`, `for...in`, in etc. But the problem is that not all of them are asynchronous
 
 ```js
 let arr = [1, 2, 3, 4, 5, 6];
 
 // It waits for 3 seconds and continues execution
+
 arr.map(async (val, index) => {
 	await wait(3000);
+
 	console.log(val);
 });
 
 // But a for loop waits 3 seconds each time
+
 for (let i = 0; i < arr.length; i++) {
 	await wait(3000);
+
 	console.log(arr[i]);
 }
 ```
 
-**Note:** This approach might not be ideal for large arrays due to performance reasons. It's generally recommended to use asynchronous alternatives like `async/await` with `Promise.all` for better performance when dealing with multiple asynchronous operations.
+\*\*Note: This is not very important but it is worthy of notice. Just use `async/await` with the `Promise.all` if you are working with a lot of async operations.
 
 ### Generator Functions
 
-A generator function in JavaScript is a special type of function that allows you to pause and resume its execution. It's defined using an asterisk () after the function keyword. When you call a generator function, it doesn't run the entire function at once. Instead, it returns a special type of iterator object called a generator object. This next function contains the value (current value), and a `next` function (calling it retrieves the next set of values).
+They are capable of retaining context, kind of like a closure. It is a special type of function that uses the `function*` syntax. It can be used when implementing infinite scroll or handling an infinite stream of data. When used in conjunction with Promises we are able to deal with async logic. Instead, it returns a special type of iterator object called a generator object. This next function contains the value (current value), `next` function (calling it retrieves the next set of values).
 
 ```js
 function* iterator(array) {
 	let index = 0;
+
 	let arrayLength = array.length;
+
 	while (index < arrayLength) {
 		yield array[index++];
 	}
 }
 
 const arr = [1, 2, 3, 4, 5];
+
 const generator = iterator(arr);
 
 async function processGenerator() {
@@ -145,7 +164,9 @@ async function processGenerator() {
 
 	while (!nextIteration.done) {
 		await wait(3000);
+
 		console.log(nextIteration.value);
+
 		nextIteration = generator.next();
 	}
 }
@@ -153,20 +174,23 @@ async function processGenerator() {
 processGenerator();
 ```
 
-The above code snippet showcases a custom iterator that provides more flexibility.
+The above is a custom iterator which gives us the flexibility to do more.
 
-### Pitfalls to Avoid
+### Pitfalls to avoid
 
-When fetching data, it's important to avoid nesting your fetch calls to prevent a **waterfall request**. If the requests are not dependent on each other, there's no reason to wait for the previous one to resolve before proceeding with the subsequent one.
+When fetching data it is important to avoid nesting your fetch calls to avoid a **waterfall request,**
+if the requests are not dependent on each other then there is no reason to wait for the previous one to resolve before proceeding to the subsequent one.
 
 ```js
 // Avoid this pitfall request
 
 async function fetchPokemonData() {
 	let analytics = await fetch("https://example.com/analytics/1092");
+
 	let userData = await fetch("https://example.com/api/user/123");
 
 	let response1 = await userData.json();
+
 	let response2 = await analytics.json();
 
 	return [response1.name, response2.name];
@@ -177,22 +201,25 @@ async function fetchPokemonData() {
 async function fetchUserData() {
 	let [userData, analytics] = await Promise.all([
 		fetch("https://example.com/api/user/123"),
+
 		fetch("https://example.com/analytics/1092"),
 	]);
 
 	let [response1, response2] = await Promise.all([
 		userData.json(),
+
 		analytics.json(),
 	]);
+
 	return [response1.name, response2.name];
 }
 ```
 
-### Error Handling
+### Error handling
 
-Handling errors for asynchronous code can be a bit tricky, but with the right set of tools and strategies provided by JavaScript, we can handle errors properly.
+Asynchronous error handling can be a little confusing, but with the right set of tools and strategies provided to us by javascript we are able to handle errors properly.
 
-In JavaScript, we handle runtime errors using `try...catch` blocks. The code between the `try` braces is executed, and errors are caught with the `catch` statement.
+In JavaScript, runtime errors are caught with the use of `try...catch` blocks. The code between the `try` braces is executed and errors are caught with the `catch` statement.
 
 ```js
 try {
@@ -202,12 +229,13 @@ try {
 }
 ```
 
-It's generally recommended to avoid deeply nested `try...catch` statements. Aim to be as DRY (Don't Repeat Yourself) as possible. Nested `try...catch` statements can be hard to follow and read. Here's one way to achieve DRY principles: create a `tryCatch` function that accepts a function, its arguments, and returns either the error or the resolved value. This allows for cleaner error handling.
+Avoid nested try catch statements, try to be as DRY (Don't Repeat Yourself) as possible. Nesting `try...catch` statements complicates the code. So one way to be DRY is to create a `try...catch` function which accepts a function, its arguments, and returns either the error or the resolved value. This is one way to handle the error in a cleaner and simplified manner.
 
 ```js
 const tryCatch = async (cb, ...args) => {
 	try {
 		let data = await cb(...args);
+
 		return [null, data];
 	} catch (error) {
 		return [error];
@@ -216,9 +244,8 @@ const tryCatch = async (cb, ...args) => {
 
 async function fetchData(id) {
 	// Error path
-	throw new Error(`Could not find user with id: ${id}`);
-	// Success path (commented out for demonstration)
-	// return `The blog data was fetched for user by id: ${id}`;
+
+	throw new Error(`Could not find user with id: ${id}`); // Success path (commented out for demonstration) // return `The blog data was fetched for user by id: ${id}`;
 }
 
 async function getUserId() {
@@ -226,6 +253,7 @@ async function getUserId() {
 
 	if (error) {
 		console.error(error.message);
+
 		return;
 	}
 
@@ -235,17 +263,33 @@ async function getUserId() {
 getUserId();
 ```
 
+As you can notice it is much cleaner and readable.
+
 ### Cancellation of Asynchronous Operations
 
-Asynchronous operations are the backbone of modern web applications. They allow us to fetch data, perform tasks without blocking the UI, and create a more responsive user experience. But what happens when an asynchronous operation takes longer than expected, or becomes irrelevant based on user actions? This is where cancellation comes in.
+Asynchronous operations are very useful in computing whether frontend or backend etc. They allow us to fetch data, perform complex logic without blocking the UI, and create a more responsive user experience. Issues can arise in react when trying to fetch data but the component has already unmounted. So this is where cancellation comes in.
 
-Cancellation gives us the power to gracefully interrupt ongoing asynchronous operations. Imagine you're waiting for an API response, but the user navigates away from the page. In this scenario, canceling the ongoing API call would be ideal to avoid unnecessary processing and improve performance.
+Cancellation gives us the power to gracefully skip an ongoing async operation. Imagine a user has already navigated away from the page, there is not a single reason to keep fetching the user data. So in this scenario, it makes sense to terminate or cancel the fetch request and improve user experience.
 
-Here, we'll explore how to achieve cancellation using the `AbortController` and `EventEmitter` classes. Similar to how we can cancel a fetch request using the `AbortController` API in the browser.
+Below, I will explore how to achieve the same kind of logic as seen in some fetch requests in the browser. By using the `AbortController` a custom class extending the `EventEmitter` class, I will be replicating the logic but using our simple `wait` function.
 
-##### Building the Cancellation Mechanism
+```js
+function wait(time, signal) {
+	return new Promise((resolve, reject) => {
+		const timeoutId = setTimeout(() => {
+			console.log("API was called, operation was not aborted");
 
-We'll leverage the `EventEmitter` class, a core JavaScript module for creating custom events. We'll build an `AbortController` class that inherits from `EventEmitter`. This `AbortController` will act as a central entity for managing cancellation signals.
+			resolve();
+		}, time);
+
+		if (signal) {
+			signal.abort(timeoutId, resolve); // Resolve or Reject as you need
+		}
+	});
+}
+```
+
+I will create an 'AbortController' class which will extend 'EventEmitter'. A core Javascript module for creating custom events.
 
 ```js
 const EventEmitter = require("events");
@@ -253,6 +297,7 @@ const EventEmitter = require("events");
 class AbortController extends EventEmitter {
 	constructor(options) {
 		super(options);
+
 		this.addListener();
 	}
 
@@ -266,55 +311,33 @@ class AbortController extends EventEmitter {
 
 	abort(timeoutId, handler) {
 		clearTimeout(timeoutId);
+
 		handler();
+
 		console.log("Event aborted");
 	}
 }
 ```
 
-The `AbortController` has two key methods:
+The 2 methods of the `AbortController` are the following:
 
-- `addListener`: This method adds an event listener for the "abort" event. You can customize this behavior to suit your specific needs. In our example, it simply logs a message.
-- `abort`: This method takes two arguments: the timeout ID associated with the asynchronous operation and a callback function. When called, it clears the timeout and executes the callback function, effectively canceling the operation.
+- `addListener`: This method will add an event listener, listening for the `abort` event
 
-We'll create a `wait` function that simulates an asynchronous operation. This function takes two arguments:
+- `abort`: this is event which our event listener will listen for. And from there execute necessary logic to end the function
 
-- `time`: The amount of time (in milliseconds) to wait before resolving the promise.
-- `signal` (optional): An instance of the `AbortController` class.
+an instance of the `AbortController` class to be passed to the `wait` function
 
-```js
-function wait(time, signal) {
-	return new Promise((resolve, reject) => {
-		const timeoutId = setTimeout(() => {
-			console.log("API was called, operation was not aborted");
-			resolve();
-		}, time);
+#### Putting it all together
 
-		if (signal) {
-			signal.abort(timeoutId, resolve); // Resolve or Reject as you need
-		}
-	});
-}
-```
-
-The `wait` function returns a promise. Inside the promise, we set a timeout using `setTimeout`. If a `signal` object is provided, we attach a listener to the `abort` event emitted by the `AbortController`. When the `abort` event is triggered, the `abort` method of the `AbortController` is called. This method clears the timeout and resolves the promise, effectively canceling the operation.
-
-##### Putting it All Together: The `main` Function
-
-Finally, let's see how we can use the `AbortController` and `wait` function in practice:
+In the main function, we create an instance of `AbortController`. This is not a 1:1 clone of how it was achieved in the fetch api on how to cancel a fetch request
 
 ```js
 async function main() {
 	try {
-		let signal = new AbortController();
+		let signal = new AbortController(); // Option 1: Using addListener for explicit control
 
-		// Option 1: Using addListener for explicit control
-		await wait(10000, signal.addListener());
+		await wait(10000, signal.addListener()); // Option 2: Passing the AbortController instance directly // await wait(10000, signal); // await wait(10000); // Without abort controller
 
-		// Option 2: Passing the AbortController instance directly
-		// await wait(10000, signal);
-
-		// await wait(10000); // Without abort controller
 		console.log("Resolved request");
 	} catch (e) {
 		console.log("Rejected request");
@@ -323,13 +346,6 @@ async function main() {
 
 main();
 ```
-
-In the `main` function, we create an instance of `AbortController`. We then have two options for using the `wait` function with cancellation:
-
-1. **Explicit Control with `addListener`**: We call `signal.addListener()` to add an event listener for the "abort" event. This approach provides more granular control over the cancellation behavior.
-2. **Direct Instance Passing**: We can simply pass the `signal` instance directly as the second argument to the `wait` function. This is a more concise approach.
-
-With either option, if we decide to cancel the operation before the timeout expires, we can trigger the `abort` event on the `signal` object. This will in turn clear the timeout and resolve the promise associated with the `wait` function.
 
 ### Conclusion
 
