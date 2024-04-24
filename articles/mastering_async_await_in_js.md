@@ -215,6 +215,71 @@ async function fetchUserData() {
 }
 ```
 
+#### Differences between `Promise.all` and `Promise.allSettled`
+
+**Note:** one key difference between `Promise.all` and `Promise.allSettled`
+is that `Promise.all` will fail fast while `Promise.allSettled` will not
+regardless of whether they fulfill or reject. Depending on your use case they can come in handy.
+
+```js
+const asyncOperation = (ms, value) => {
+	return new Promise((resolve, reject) => {
+		return setTimeout(() => {
+			if (value === "error") {
+				reject(new Error(value));
+			} else {
+				resolve(value);
+			}
+		}, ms);
+	});
+};
+
+async function fetch1() {
+	return await asyncOperation(1000, "Data fetched successfully");
+}
+async function fetch2() {
+	return await asyncOperation(1000, "error");
+}
+async function fetch3() {
+	return await asyncOperation(1000, "Data fetched successfully");
+}
+
+async function main1() {
+	try {
+		let [result1, result2, result3] = await Promise.all([
+			fetch1(),
+			fetch2(),
+			fetch3(),
+		]);
+
+		console.log(result1);
+		console.log(result2);
+		console.log(result3);
+	} catch (e) {
+		console.log("Promise.all Error:", e.message);
+	}
+}
+
+async function main2() {
+	try {
+		let [result1, result2, result3] = await Promise.allSettled([
+			fetch1(),
+			fetch2(),
+			fetch3(),
+		]);
+
+		console.log(result1);
+		console.log(result2);
+		console.log(result3);
+	} catch (e) {
+		console.log("Promise.allSettled Error:", e.message);
+	}
+}
+
+main1();
+main2();
+```
+
 ### Error handling
 
 Asynchronous error handling can be a little confusing, but with the right set of tools and strategies provided to us by javascript we are able to handle errors properly.
